@@ -7,6 +7,7 @@ import json
 def get_entity(p_id):
     return ndb.Key(urlsafe=p_id).get()
 
+
 def string_to_bool(p_string):
     if p_string == '':
         return None
@@ -147,11 +148,6 @@ class BooksHandler(webapp2.RequestHandler):
             get_entity(id).key.delete()
 
 
-def update_title(p_book, p_title):
-    p_book['title'] = p_title
-    return p_book
-
-
 class CheckInOut(webapp2.RequestHandler):
     def put(self, *args):
         customer_id = args[0]
@@ -184,6 +180,26 @@ class CheckInOut(webapp2.RequestHandler):
         customers.put()
 
 
+class CheckedOutHandler(webapp2.RequestHandler):
+    def get(self, id=None):
+        customer_id = id
+        customer = get_entity(customer_id)
+        cust_dict = customer.to_dict()
+        books_checked_out = cust_dict['checked_out']
+        results = []
+        for book in books_checked_out:
+            book = CheckedOutHandler.url_string_maker(book)
+            book = get_entity(book)
+            book_d = book.to_dict()
+            results.append(book_d)
+        self.response.write(json.dumps(results))
+
+    @staticmethod
+    def url_string_maker(book_str):
+        return book_str.replace('/books/', '').replace(' ', '').replace('[', '').replace(']', '') \
+            .replace('u\'', '').replace('\'', '')
+
+
 class MainPage(webapp2.RequestHandler):
     def get(self):
         self.response.write('Main Page, there shouldn\'t be anything here right now!')
@@ -199,6 +215,7 @@ webapp2.WSGIApplication.allowed_methods = new_allowed_methods
 app = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/customers/(.*)/books/(.*)', CheckInOut),
+    ('/customers/(.*)/books', CheckedOutHandler),
     ('/customers', CustomersHandler),
     ('/customers/', CustomersHandler),
     ('/customers/(.*)', CustomersHandler),
