@@ -218,7 +218,6 @@ app = webapp2.WSGIApplication([
     ('/customers/(.*)/books/(.*)', CheckInOut),
     ('/customers/(.*)/books', CheckedOutHandler),
     ('/customers', CustomersHandler),
-    ('/customers/', CustomersHandler),
     ('/customers/(.*)', CustomersHandler),
     ('/books', BooksHandler),
     ('/books/', BooksHandler),
