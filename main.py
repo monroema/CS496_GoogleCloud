@@ -54,6 +54,7 @@ class CustomersHandler(webapp2.RequestHandler):
             for entity in customer_list:
                 single_customer = entity.to_dict()
                 single_customer['id'] = entity.key.id()
+                single_customer['self'] = '/customers/' +entity.key.id()
                 results.append(single_customer)
             self.response.write(json.dumps(results))
 
